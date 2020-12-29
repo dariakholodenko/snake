@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  	<title>Snake</title>
+  </head>
+
+  <style>
+    body {
+			margin: 0;
+			overflow: hidden;
+		}
+  </style>
+
+  <body>
+	<canvas id="canvas" width="400" height="400"></canvas>
+	<div id="score"></div>
+
+  <script>
+  
+	const canvas = document.getElementById("canvas");
+	
+	const ctx = canvas.getContext("2d");  
+    
+    let snake = [
+      {x: 200, y: 200},
+      {x: 190, y: 200},
+      {x: 180, y: 200},
+      {x: 170, y: 200},
+      {x: 160, y: 200}
+    ]
+
+    
+    let dx = 0;
+    let dy = 0;
+	let appleX;
+	let	appleY; 
+    let snake_moved = false;
+    let score = 0;
+    
+	main();
+	
+	genFood();
+	
+    document.addEventListener("keydown", changeDirection);
+    
+    function main() {
+		setTimeout(function onTick() {
+			clearCanvas();
+			drawSnake();
+			drawFood();
+			if(snake_moved) moveSnake();
+			
+			main();
+      }, 100)
+    }
+    
+   
+    function clearCanvas() {
+   
+		ctx.fillStyle = 'white';
+		ctx.strokestyle = 'black';
+		
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		ctx.strokeRect(0, 0, canvas.width, canvas.height);
+    }
+    
+	function moveSnake() {
+	
+		const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+		
+		snake.unshift(head);
+		
+		if(snake[0].x === appleX && snake[0].y === appleY) {
+			score += 10;
+			document.getElementById("score").innerHTML = score;
+			genFood();
+		}
+		else  {
+			snake.pop();
+		}
+	}
+    
+    function drawSnake() {
+ 
+      snake.forEach(drawSnakePart)
+    }
+
+     
+    function drawSnakePart(snakePart) {
+
+		ctx.fillStyle = 'lightblue';
+		ctx.strokestyle = 'black';
+      
+		ctx.fillRect(snakePart.x, snakePart.y, 10, 10);
+		ctx.strokeRect(snakePart.x, snakePart.y, 10, 10);
+    }
+	
+	function drawFood() {
+			
+		ctx.fillStyle = 'red';
+		ctx.fillRect(appleX, appleY, 10, 10);
+	}
+	
+	function randomFood(min, max) {
+		//return Math.random() * (max - min) + min;
+		return Math.round((Math.random() * (max-min) + min) / 10) * 10;
+	}
+	
+	function genFood() {
+		appleX = randomFood(20, canvas.width - 20);
+		appleY = randomFood(20, canvas.height - 20);
+		
+		snake.forEach(function isCollision(part) {
+			if(part.x === appleX && part.y === appleY) {
+				genFood();
+			}
+		});
+	}
+   
+
+    function changeDirection(e) {
+		
+		if(e.keyCode >= 37 && e.keyCode <= 40) snake_moved = true;
+					
+			switch(e.keyCode) {
+				case 37: //left
+					dx = -10;
+					dy = 0;
+					break;
+					
+				case 38: //up
+					dx = 0;
+					dy = -10;
+					break;
+					
+				case 39: //right
+					dx = 10;
+					dy = 0;
+					break;
+					
+				case 40: //down
+					dx = 0;
+					dy = 10;
+					break;
+				
+				default:
+					break;
+			}
+	}
+	
+	
+ </script>
+ </body>
+</html>
